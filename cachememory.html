@@ -22,17 +22,28 @@
         }
 
         #output {
-            width: 80%;
-            margin-bottom: 20px;
-            text-align: center;
+			position: relative;
+            display: none;
+            height: 350px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+			width: 50%;
         }
 
-        .cache {
-            display: flex;
-            margin-bottom: 10px;
+		#memory-values {
+            display: block;
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            width: 50%;
         }
 
         .cache-set {
+            margin-bottom: 5px;
             margin-right: 10px;
             border: 1px solid #ccc;
             padding: 10px;
@@ -58,128 +69,300 @@
         button:hover {
             background-color: #45a049;
         }
+		
+		#nextbutton {
+			display: none;
+			margin-top: 15px;
+			margin-left: 740px;
+		}
+		
+		nextbutton {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        nextbutton:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
 
 <div id="simulation-controls">
-    <label for="memory-size">Memory Size:</label>
-    <input type="number" id="memory-size" value="32">
+    <label for="memoryBlocks" id="memoryBlocksLabel">Memory Blocks:</label>
+    <input type="number" id="memoryBlocks" value="32">
 
-    <label for="sets">Number of Sets:</label>
-    <input type="number" id="sets" value="4">
+    <label for="test-case">Select Test Case:</label>
+    <select id="test-case">
+        <option value="1">Sequential blocks</option>
+        <option value="2">Random blocks</option>
+        <option value="3">Mid-repeat blocks</option>
+		<option value="4">Manual Input blocks</option>
+    </select>
 
-    <label for="blocks-per-set">Blocks per Set:</label>
-    <input type="number" id="blocks-per-set" value="8">
-
-    <button onclick="simulateCache()">Simulate Cache Process</button>
+    <label>
+        <input type="checkbox" id="show-each-step" checked>
+        Show each step
+    </label>
+    <button id="simulateCache">Simulate Cache Process</button>
 </div>
 
+<div id="memory-values">
+    <textarea id="memory-input" placeholder="Enter comma-separated memory values" style="width: 99%; height: 190px; resize: none;"></textarea>
+</div>
 <div id="output"></div>
+<button id="nextbutton">Next</button>
+
 
 <script>
-    function simulateCache() {
-        var memorySize = parseInt(document.getElementById('memory-size').value, 10);
-        var sets = parseInt(document.getElementById('sets').value, 10);
-        var blocksPerSet = parseInt(document.getElementById('blocks-per-set').value, 10);
+    const SETS = 4;
+    const BLOCKS_PER_SET = 8;
+    const WORDS_PER_BLOCK = 64;
+    const EMPTY = '';
+    const CACHE_ACCESS_TIME = 1;
+    const MEM_ACCESS_TIME = 10;
 
-        var cache = Array.from({ length: sets }, () => Array(blocksPerSet).fill(''));
-        var lruStack = Array.from({ length: sets }, () => []);
-        var memory = Array.from({ length: memorySize }, (_, index) => index + 1);
+	document.getElementById('test-case').addEventListener('change', function() {
+		const testCase = this.value;
+		const memoryBlocksLabel = document.getElementById('memoryBlocksLabel');
+		const memoryBlocksField = document.getElementById('memoryBlocks');
+		const memoryInputField = document.getElementById('memory-input');
 
-        var outputElement = document.getElementById('output');
-        outputElement.innerHTML = '<strong>Output:</strong><br>';
+		if (testCase === '3') {
+			memoryBlocksLabel.textContent = 'Cache Blocks:';
+		} else {
+			memoryBlocksLabel.textContent = 'Memory Blocks:';
+		}
+		
+		if (testCase === '4') {
+			memoryInputField.disabled = false;
+			memoryBlocksField.disabled = true;
+		} else {
+			memoryInputField.disabled = true;
+			memoryBlocksField.disabled = false;
+		}
+	});
+	
+    document.getElementById('simulateCache').addEventListener('click', async () => {
+		const memoryBlocks = document.getElementById('memoryBlocks').value;
+		const testCase = document.getElementById('test-case').value;
+		const showEachStep = document.getElementById('show-each-step').checked;
+		let memoryInput = document.getElementById('memory-input');
 
-        // Display cache sets
-        for (var setIndex = 0; setIndex < cache.length; setIndex++) {
-            outputElement.innerHTML += '<div class="cache">';
-            for (var blockIndex = 0; blockIndex < cache[setIndex].length; blockIndex++) {
-                outputElement.innerHTML += '<div class="cache-set">' + cache[setIndex][blockIndex] + '</div>';
-            }
-            outputElement.innerHTML += '</div>';
+		let memory;
+		if (testCase === '4') {
+			memory = memoryInput.value.split(',').map(Number);
+		} else {
+			memory = generateMemory(testCase, memoryBlocks);
+		}
+
+		const cache = Array.from({ length: SETS }, () => Array(BLOCKS_PER_SET).fill(EMPTY));
+		const lruStack = Array.from({ length: SETS }, () => []);
+
+		let outputElement = document.getElementById('output');
+		outputElement.style.display = 'block';
+		outputElement.innerHTML = '<strong>Output:</strong><br>';
+
+		let logContent = await simulateCacheProcess(memory, cache, lruStack, showEachStep, outputElement);
+		generateDownload(logContent, 'Caching Log.txt');
+	});
+	
+	document.getElementById('memory-input').addEventListener('input', function(event) {
+		const memoryInput = event.target.value.trim();
+		const memoryBlocksField = document.getElementById('memoryBlocks');
+
+		if (memoryInput.length > 0) {
+			memoryBlocksField.disabled = true;
+		} else {
+			memoryBlocksField.disabled = false;
+		}
+	
+		const memoryValues = event.target.value.split(',').map(val => val.trim());
+		document.getElementById('memoryBlocks').value = memoryValues.length;
+	});
+	
+	document.addEventListener('DOMContentLoaded', function() {
+		document.getElementById('memory-input').addEventListener('input', function(event) {
+			this.value = this.value.replace(/[^0-9,]/g, '').replace(/,,+/g, ',');
+		});
+
+		document.getElementById('memoryBlocks').addEventListener('input', function(event) {
+			this.value = this.value.replace(/[^0-9]/g, '');
+		});
+		
+		document.getElementById('memory-input').disabled = true;
+	});
+
+    function generateMemory(testCase, memoryBlocks) {
+        let memory = [];
+        const cachesize = BLOCKS_PER_SET * SETS;
+        
+        switch (testCase) {
+			case '1':
+                for (let i = 0; i < memoryBlocks; i++) {
+                    memory.push(i);
+                }
+                for (let j = 0; j < 3; j++) {
+                    memory.push(...memory.slice(0, memoryBlocks));
+                }
+                break;
+            case '2':
+                const randrange = WORDS_PER_BLOCK;
+                for (let i = 0; i < memoryBlocks * 4; i++) {
+                    memory.push(Math.floor(Math.random() * randrange));
+                }
+                break;
+			case '3':
+					let sequence = [];
+				for (let i = 0; i < memoryBlocks - 1; i++) {
+					sequence.push(i);
+				}
+				for (let i = 1; i < memoryBlocks; i++) {
+					sequence.push(i);
+				}
+				for (let i = memoryBlocks; i < 2 * memoryBlocks; i++) {
+					sequence.push(i);
+				}
+				for (let i = 0; i < 4; i++) {
+					memory.push(...sequence);
+				}
+				break;
         }
 
-        // Display memory
-        outputElement.innerHTML += '<br><strong>Memory:</strong><br>';
-        for (var i = 0; i < memory.length; i++) {
-            outputElement.innerHTML += '<div class="memory">' + memory[i] + '</div>';
-        }
-
-        // Save log file to a folder
-        saveLogFile(cache);
-
-        // Simulate cache process
-        for (var index = 0; index < memory.length; index++) {
-            var val = memory[index];
-            cacheProcess(cache, lruStack, val, index);
-        }
+        document.getElementById('memory-input').value = memory.join(',');
+		return memory;
     }
 
-    function cacheProcess(cache, lruStack, val, index) {
-        console.log(`\nindex ${index}: ${val}`);
-        console.log("Cache:");
-        for (var setIndex = 0; setIndex < cache.length; setIndex++) {
-            console.log(`${cache[setIndex]}`);
-        }
+    async function simulateCacheProcess(memory, cache, lruStack, showEachStep, outputElement) {
+        let hits = 0, misses = 0;
+        let logContent = [];
 
-        if (cache.some(set => set.includes(val))) { // Value exists in cache
-            console.log(`value ${val} is present in set ${cache.findIndex(set => set.includes(val))} block ${cache.flat().indexOf(val)}`);
-            var cacheSet = cache.findIndex(set => set.includes(val));
+        for (let index = 0; index < memory.length; index++) {
+            let val = memory[index];
+            let cacheSet;
+            let isHit = cache.some(cset => cset.includes(val));
+            let blockNum;
 
-            // Move existing value to the top of LRU stack
-            lruStack[cacheSet].splice(lruStack[cacheSet].indexOf(val), 1);
-            lruStack[cacheSet].push(val);
-        } else { // Value does not exist in cache
-            console.log(`value ${val} is not present in cache`);
-            console.log(`index ${index} with value ${val} going to set ${index % cache.length}`);
+            if (isHit) {
+                hits++;
+                cacheSet = cache.findIndex(cset => cset.includes(val));
+                blockNum = cache[cacheSet].indexOf(val);
+                lruStack[cacheSet].splice(lruStack[cacheSet].indexOf(val), 1);
+                lruStack[cacheSet].push(val);
 
-            var cacheSet = index % cache.length;
-
-            if (cache[cacheSet].some(block => block === '')) {
-                console.log("Set is not full");
-                var blockNum = cache[cacheSet].indexOf('');
-                cache[cacheSet][blockNum] = val;
-                console.log(`value ${val} placed in set ${cacheSet} block ${blockNum}`);
+                logContent.push(`Value ${val} is present in set ${cacheSet} block ${blockNum}`);
             } else {
-                console.log("Set is full, therefore LRU");
+                misses++;
+				cacheSet = index % SETS;
+				logContent.push(`Value ${val} is not present in cache...`);
+				logContent.push(`Index ${index} with value ${val} going to set ${cacheSet}`);
+				
+                if (cache[cacheSet].includes(EMPTY)) {
+                    blockNum = cache[cacheSet].indexOf(EMPTY);
+					
+                    logContent.push("Set is not full");
+                } else {
+                    let lruVal = lruStack[cacheSet][0];
+                    lruStack[cacheSet].shift();
+                    blockNum = cache[cacheSet].indexOf(lruVal);
 
-                // Get index of LRU block from the bottom-most value and remove said value from the LRU stack
-                var lruVal = lruStack[cacheSet][0];
-                lruStack[cacheSet].splice(0, 1);
-                var blockNum = cache[cacheSet].indexOf(lruVal);
+                    logContent.push("Set is full therefore LRU");
+                }
 
                 cache[cacheSet][blockNum] = val;
-                console.log(`value ${val} placed in set ${cacheSet} block ${blockNum}`);
+                lruStack[cacheSet].push(val);
+
+                logContent.push(`Value ${val} placed in set ${cacheSet} block ${blockNum}`);
             }
 
-            lruStack[cacheSet].push(val);
+            if (showEachStep) {
+				updateOutput(cache, index, hits, misses, memory[index], outputElement);
+				await next();
+			}
+			if (!showEachStep) {
+				document.getElementById('nextbutton').style.display = 'none';
+			}
+            
+            logContent.push(`Step ${index}: Memory value ${val}, Hits: ${hits}, Misses: ${misses}`);
         }
 
-        console.log("Updated Cache:");
-        for (var setIndex = 0; setIndex < cache.length; setIndex++) {
-            console.log(`${cache[setIndex]}`);
-        }
+        displayFinalOutput(cache, hits, misses, memory.length, outputElement);
+		
+		cache.forEach((set, index) => {
+            logContent.push(`Set ${index}: ${set.join(', ')}`);
+        });
+
+        const memAccess = memory.length;
+        const avgAccessTime = ((hits * CACHE_ACCESS_TIME + misses * (1 + MEM_ACCESS_TIME)) / memAccess).toFixed(2);
+        const totalAccessTime = (hits * WORDS_PER_BLOCK * CACHE_ACCESS_TIME) + misses * (1+(WORDS_PER_BLOCK*MEM_ACCESS_TIME));
+
+        logContent.push(`Memory Access Count = ${memAccess}`);
+        logContent.push(`${hits} hits, ${misses} misses`);
+        logContent.push(`Hit Rate = ${hits}/${memAccess}, Miss Rate = ${misses}/${memAccess}`);
+        logContent.push(`Average Memory Access Time = ${avgAccessTime} ns`);
+        logContent.push(`Total Memory Access Time = ${totalAccessTime} ns`);
+
+        return logContent.join('\n');
+    }
+	
+	function next() {
+        return new Promise(resolve => {
+            const nextButton = document.getElementById('nextbutton');
+            nextButton.style.display = 'block';
+            nextButton.onclick = () => {
+                nextButton.style.display = 'none';
+                document.getElementById('output').innerHTML = ''; // Clear output box
+                resolve();
+            };
+        });
     }
 
-    function saveLogFile(cache) {
-        var logContent = '';
-        for (var setIndex = 0; setIndex < cache.length; setIndex++) {
-            logContent += `Set ${setIndex}: ${cache[setIndex].toString()}\n`;
-        }
+    function updateOutput(cache, index, hits, misses, memoryValue, outputElement) {
+		let stepOutput = `<br><div class="cache-state"><strong>Index ${index}, Memory Value: ${memoryValue}:</strong>`;
+		cache.forEach((set, setIndex) => {
+			stepOutput += `<div class="cache-set">Set ${setIndex}: ` + set.join(', ') + '</div>';
+		});
+		stepOutput += `<div> Hits: ${hits}, Misses: ${misses} </div></div>`;
+		outputElement.innerHTML += stepOutput;
+	}
 
-        var blob = new Blob([logContent], { type: 'text/plain' });
-        var fileName = 'Caching_Log.txt';
-        var folderPath = 'logs/'; // Specify your desired folder path
-        var downloadLink = document.createElement('a');
+    function displayFinalOutput(cache, hits, misses, memAccesses, outputElement) {
+        let finalOutput = '<br><div class="cache-state"><strong>Final Cache State:</strong><br>';
+        cache.forEach((set, index) => {
+            finalOutput += `<div class="cache-set">Set ${index}: ` + set.join(', ') + '</div>';
+        });
+        finalOutput += '</div>';
 
-        downloadLink.href = window.URL.createObjectURL(blob);
-        downloadLink.download = fileName;
-        downloadLink.style.display = 'none';
-        document.body.appendChild(downloadLink);
+        const avgAccessTime = ((hits * CACHE_ACCESS_TIME + misses * (1 + MEM_ACCESS_TIME)) / memAccesses).toFixed(2);
+        const totalAccessTime = (hits * WORDS_PER_BLOCK * CACHE_ACCESS_TIME) + misses * (1+(WORDS_PER_BLOCK*MEM_ACCESS_TIME));
 
-        downloadLink.click();
+        finalOutput += `<strong>Final Statistics:</strong><br> 
+                        Memory Access Count = ${memAccesses}<br>
+                        Hits: ${hits}, Misses: ${misses}<br>
+                        Hit Rate = ${hits}/${memAccesses}, Miss Rate = ${misses}/${memAccesses}<br>
+                        Average Access Time: ${avgAccessTime} ns<br> 
+                        Total Access Time: ${totalAccessTime} ns<br>`;
+        outputElement.innerHTML += finalOutput;
+		
+		document.getElementById('nextbutton').style.display = 'none';
+    }
 
-        document.body.removeChild(downloadLink);
+    function generateDownload(text, filename) {
+        const element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
     }
 </script>
 
