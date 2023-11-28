@@ -1,3 +1,11 @@
+<!--Group 8 Members:
+    1. Tumalad, Shawne Michael Q.
+    2. Del Rosario, Michael Gabriel A. 
+    3. Fulcher, Lander Gabriel A.
+    4. Azevedo, Marquus Joss R.
+
+    CSARCH2 - S12
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +13,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cache Memory Simulation</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Prompt&family=Roboto&display=swap');
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
@@ -14,30 +23,44 @@
             align-items: center;
             justify-content: center;
             height: 100vh;
-            background-color: #f4f4f4;
+            background-color: #5cdb95;
+            background-image: linear-gradient(-20deg, #00cdac 0%, #8ddad5 100%);
+        }
+
+        body, label, input, select, button {
+            font-size: 16px;
+            color: #05386b;
         }
 
         #simulation-controls {
             margin-bottom: 20px;
+            display: flex;
+        }
+
+        #mem-blk,
+        #test-block,
+        #com-block {
+            margin-right: 10px;
+            align-self: center;
         }
 
         #output {
-			position: relative;
             display: none;
             height: 350px;
             overflow-y: auto;
-            border: 1px solid #ccc;
+            border: 1px solid #05386b;
             padding: 10px;
             margin-top: 10px;
 			width: 50%;
+            background-color: #05386b;
+            color: #edf5e1;
         }
 
 		#memory-values {
             display: block;
             height: 200px;
             overflow-y: auto;
-            border: 1px solid #ccc;
-            padding: 10px;
+            border: 5px solid #05386b;
             margin-top: 10px;
             width: 50%;
         }
@@ -45,9 +68,11 @@
         .cache-set {
             margin-bottom: 5px;
             margin-right: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid #edf5e1;
             padding: 10px;
             text-align: center;
+            background-color: #edf5e1;
+            color: #05386b;
         }
 
         .memory {
@@ -57,67 +82,109 @@
         }
 
         button {
-            padding: 10px;
-            font-size: 16px;
+            display: inline-block;
+            outline: 0;
+            text-align: center;
             cursor: pointer;
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            border-radius: 5px;
+            padding: 17px 30px;
+            border: 0;
+            font-size: 17.5px;
+            border: 2px solid transparent;
+            border-color: #05386b;
+            color: #05386b;
+            background: transparent;
+            font-weight: 800;
+            line-height: 30px;
+            transition: background, color .5s ease-in-out;
         }
 
         button:hover {
-            background-color: #45a049;
+            background-color: #05386b;
+            color: #edf5e1;
         }
 		
-		#nextbutton {
-			display: none;
-			margin-top: 15px;
-			margin-left: 740px;
-		}
-		
-		nextbutton {
-            padding: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            border-radius: 5px;
+		#nextbutton,
+        #skipbutton {
+        display: inline-block;
+        margin: 10px;
+        padding: 10px;
+        font-size: 16px;
+        width: 100px; /* Adjust the width as needed */
         }
 
-        nextbutton:hover {
-            background-color: #45a049;
+        #button-container {
+        display: none;
+        margin: 10px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            background-color: #edf5e1; 
+            color: #05386b; 
+            border: 1px solid #edf5e1;
+            padding: 8px; 
+            font-size: 16px;
+        }
+
+       
+        input[type="checkbox"] {
+            background-color: #edf5e1;
+            color: #05386b;
+            border: 1px solid #edf5e1; 
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        textarea {
+            background-color: #edf5e1;
+            color: #05386b; 
+            border: 1px solid #edf5e1; 
+            padding: 8px;
+            font-size: 16px; 
+            width: 99%;
+            height: 190px;
+            resize: none;
         }
     </style>
 </head>
 <body>
 
 <div id="simulation-controls">
-    <label for="memoryBlocks" id="memoryBlocksLabel">Memory Blocks:</label>
-    <input type="number" id="memoryBlocks" value="32">
+    <div id ="mem-blk">
+        <label for="memoryBlocks" id="memoryBlocksLabel">Blocks:</label>
+        <input type="number" id="memoryBlocks" value="32">
+    </div>
 
-    <label for="test-case">Select Test Case:</label>
-    <select id="test-case">
-        <option value="1">Sequential blocks</option>
-        <option value="2">Random blocks</option>
-        <option value="3">Mid-repeat blocks</option>
-		<option value="4">Manual Input blocks</option>
-    </select>
+    <div id="test-block">
+        <label for="test-case">Select Test Case:</label>
+        <select id="test-case">
+            <option value="1">Sequential blocks (Blocks x2, Repeat 4x)</option>
+            <option value="2">Random blocks (Blocks x 4)</option>
+            <option value="3">Mid-repeat blocks</option>
+            <option value="4">Manual Input blocks</option>
+        </select>
+    </div>  
 
-    <label>
-        <input type="checkbox" id="show-each-step" checked>
-        Show each step
-    </label>
-    <button id="simulateCache">Simulate Cache Process</button>
+    <div id="com-block">
+        <label>
+            <input type="checkbox" id="show-each-step" checked>
+            Show each step
+        </label>
+    </div>
+    <div id="btn-block">
+        <button id="simulateCache">Simulate Cache Process</button>
+    </div>
 </div>
 
 <div id="memory-values">
     <textarea id="memory-input" placeholder="Enter comma-separated memory values" style="width: 99%; height: 190px; resize: none;"></textarea>
 </div>
 <div id="output"></div>
+<div id="button-container">
 <button id="nextbutton">Next</button>
-
+<button id="skipbutton">Skip</button>
+</div>
 
 <script>
     const SETS = 4;
@@ -132,12 +199,6 @@
 		const memoryBlocksLabel = document.getElementById('memoryBlocksLabel');
 		const memoryBlocksField = document.getElementById('memoryBlocks');
 		const memoryInputField = document.getElementById('memory-input');
-
-		if (testCase === '3') {
-			memoryBlocksLabel.textContent = 'Cache Blocks:';
-		} else {
-			memoryBlocksLabel.textContent = 'Memory Blocks:';
-		}
 		
 		if (testCase === '4') {
 			memoryInputField.disabled = false;
@@ -149,17 +210,27 @@
 	});
 	
     document.getElementById('simulateCache').addEventListener('click', async () => {
-		const memoryBlocks = document.getElementById('memoryBlocks').value;
+		var memoryBlocks = document.getElementById('memoryBlocks').value;
 		const testCase = document.getElementById('test-case').value;
 		const showEachStep = document.getElementById('show-each-step').checked;
 		let memoryInput = document.getElementById('memory-input');
 
+		
 		let memory;
+		if (testCase == '1') {
+			memoryBlocks = memoryBlocks * 2;
+		}
+		
 		if (testCase === '4') {
 			memory = memoryInput.value.split(',').map(Number);
 		} else {
 			memory = generateMemory(testCase, memoryBlocks);
 		}
+		
+		if (showEachStep) {
+			document.getElementById('button-container').style.display = 'flex';
+		}
+		
 
 		const cache = Array.from({ length: SETS }, () => Array(BLOCKS_PER_SET).fill(EMPTY));
 		const lruStack = Array.from({ length: SETS }, () => []);
@@ -241,7 +312,17 @@
     async function simulateCacheProcess(memory, cache, lruStack, showEachStep, outputElement) {
         let hits = 0, misses = 0;
         let logContent = [];
+        let showSteps = showEachStep;
+        const valuesPerRow = 8;
+        const formattedMemory = memory.map(value => value.toString().padStart(5, ' '));
+        const rows = [];
 
+        for (let i = 0; i < formattedMemory.length; i += valuesPerRow) {
+            rows.push(formattedMemory.slice(i, i + valuesPerRow).join(', '));
+        }
+
+        logContent.push(`Memory Values:\n${rows.join(',\n')}\n`);
+        
         for (let index = 0; index < memory.length; index++) {
             let val = memory[index];
             let cacheSet;
@@ -277,20 +358,22 @@
                 cache[cacheSet][blockNum] = val;
                 lruStack[cacheSet].push(val);
 
-                logContent.push(`Value ${val} placed in set ${cacheSet} block ${blockNum}`);
+                logContent.push(`Value ${val} placed in set ${cacheSet} block ${blockNum}\n`);
             }
 
-            if (showEachStep) {
+            if (showSteps) {
 				updateOutput(cache, index, hits, misses, memory[index], outputElement);
-				await next();
+				await next(showSteps).then(resolve => {
+					showSteps = resolve;});
 			}
-			if (!showEachStep) {
-				document.getElementById('nextbutton').style.display = 'none';
+			if (!showSteps) {
+				document.getElementById('button-container').style.display = 'none';
 			}
             
-            logContent.push(`Step ${index}: Memory value ${val}, Hits: ${hits}, Misses: ${misses}`);
+            logContent.push(`Step ${index}: Memory value ${val}, Hits: ${hits}, Misses: ${misses}\n`);
         }
 
+        logContent.push(`Memory Values:\n${rows.join(',\n')}\n`);
         displayFinalOutput(cache, hits, misses, memory.length, outputElement);
 		
 		cache.forEach((set, index) => {
@@ -310,18 +393,27 @@
         return logContent.join('\n');
     }
 	
-	function next() {
-        return new Promise(resolve => {
-            const nextButton = document.getElementById('nextbutton');
-            nextButton.style.display = 'block';
-            nextButton.onclick = () => {
-                nextButton.style.display = 'none';
-                document.getElementById('output').innerHTML = ''; // Clear output box
-                resolve();
-            };
-        });
-    }
+	function next(showStep) {
+		return new Promise(resolve => {
+			const skipButton = document.getElementById('skipbutton');
+			const nextButton = document.getElementById('nextbutton');
+			nextButton.style.display = 'block';
+			skipButton.style.display = 'block';
+			
+			skipButton.onclick = () => {
+				skipButton.style.display = 'none';
+				document.getElementById('output').innerHTML = ''; // Clear output box
+				resolve(false);
+			};
 
+			nextButton.onclick = () => {
+				nextButton.style.display = 'none';
+				document.getElementById('output').innerHTML = ''; // Clear output box
+				resolve(showStep);
+			};
+		});
+	}
+	
     function updateOutput(cache, index, hits, misses, memoryValue, outputElement) {
 		let stepOutput = `<br><div class="cache-state"><strong>Index ${index}, Memory Value: ${memoryValue}:</strong>`;
 		cache.forEach((set, setIndex) => {
@@ -349,7 +441,7 @@
                         Total Access Time: ${totalAccessTime} ns<br>`;
         outputElement.innerHTML += finalOutput;
 		
-		document.getElementById('nextbutton').style.display = 'none';
+		document.getElementById('button-container').style.display = 'none';
     }
 
     function generateDownload(text, filename) {
