@@ -237,7 +237,7 @@
 
 		let outputElement = document.getElementById('output');
 		outputElement.style.display = 'block';
-		outputElement.innerHTML = '<strong>Output:</strong><br>';
+		outputElement.innerHTML = '';
 
 		let logContent = await simulateCacheProcess(memory, cache, lruStack, showEachStep, outputElement);
 		generateDownload(logContent, 'Caching Log.txt');
