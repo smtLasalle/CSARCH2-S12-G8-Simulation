@@ -159,8 +159,8 @@
     <div id="test-block">
         <label for="test-case">Select Test Case:</label>
         <select id="test-case">
-            <option value="1">Sequential blocks (Blocks x2, Repeat 4x)</option>
-            <option value="2">Random blocks (Blocks x 4)</option>
+            <option value="1">Sequential blocks (Repeat 4x)</option>
+            <option value="2">Random blocks</option>
             <option value="3">Mid-repeat blocks</option>
             <option value="4">Manual Input blocks</option>
         </select>
@@ -214,13 +214,7 @@
 		const testCase = document.getElementById('test-case').value;
 		const showEachStep = document.getElementById('show-each-step').checked;
 		let memoryInput = document.getElementById('memory-input');
-
-		
-		let memory;
-		if (testCase == '1') {
-			memoryBlocks = memoryBlocks * 2;
-		}
-		
+	    
 		if (testCase === '4') {
 			memory = memoryInput.value.split(',').map(Number);
 		} else {
@@ -284,7 +278,7 @@
                 break;
             case '2':
                 const randrange = WORDS_PER_BLOCK;
-                for (let i = 0; i < memoryBlocks * 4; i++) {
+                for (let i = 0; i < memoryBlocks; i++) {
                     memory.push(Math.floor(Math.random() * randrange));
                 }
                 break;
