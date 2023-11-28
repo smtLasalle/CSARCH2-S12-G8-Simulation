@@ -4,7 +4,7 @@
 This application demonstrates a cache simulator that uses an 8 way block set associative (BSA) cache memory mapping function and Least Recently Used (LRU) replacement algorithm.
 
 # :cd: How to run the program
-Our main program `index.html` this [githack](https://raw.githack.com/smtLasalle/S12-CSARCH2-Simulation/main/index.html) link!
+Our main program `index.html` is run with this [githack](https://raw.githack.com/smtLasalle/S12-CSARCH2-Simulation/main/index.html) link!
 
 # :hammer_and_wrench: Program specifications
 * **Scope and Limitations**
