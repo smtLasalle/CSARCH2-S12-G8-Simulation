@@ -18,8 +18,8 @@ Just click this [githack](https://raw.githack.com/smtLasalle/S12-CSARCH2-Simulat
   + `Blocks` - The amount of memory blocks. Usage will vary depending on selected test case.
   + `Input box` - Only modifiable when `Manual Input blocks` is selected. Only accepts numbers and comma as input.
   + `Test case` - The 3 test cases provided in the rubric, with the option of manual input:
-     * *Sequetial blocks* - 0 to 2*Blocks - 1, repeated 4 times
-     * *Random blocks* - Random values 0-63 in the range of Blocks*4
+     * *Sequetial blocks* - 0 to Blocks - 1, repeated 4 times
+     * *Random blocks* - Random values 0-63 in the range of Blocks
      * *Mid-Repeat blocks* - Start at block 0, repeat the sequence in the middle two times up to n-1 blocks, after which continue up to 2n. Then, repeat the sequence four times.  
        Example: 8 Blocks = 0, 1,2,3,4,5,6, 1,2,3,4,5,6, 7,8,9,10,11,12,13,14,15 repeated 4 times.
      * *Manual Input blocks* - User input values. The Block size will change in real-time
