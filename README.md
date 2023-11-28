@@ -65,7 +65,7 @@ Our main program `index.html` is run with this [githack](https://raw.githack.com
   * **Random sequence**  
     The random sequence has a range of `n` blocks.  
     We decided to have a random value range of `0` to `63` to correlate with the words per block.   
-    To simulate the requested test case of `4n` cache blocks, we do `4 * 32 = 128`
+    To simulate the requested test case of `4n` cache blocks, we do `4 * 32 = 128`  
     Given a blocks input `n = 128`, the random sequence would have a range of `128` blocks
 
     * Cache memory tracing  
