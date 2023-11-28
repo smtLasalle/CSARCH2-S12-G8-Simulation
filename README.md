@@ -10,7 +10,7 @@ A walkthrough of the program can be viewed [here](https://drive.google.com/file/
 Our main program `index.html` is run with this [githack](https://raw.githack.com/smtLasalle/S12-CSARCH2-Simulation/main/index.html) link!
 
 # :hammer_and_wrench: Program specifications
-* **Scope and Limitations**
+### **Scope and Limitations**
   * `32` Cache blocks
   * `64` Binary words per block
   * `10` ns Memory access time
@@ -21,7 +21,7 @@ Our main program `index.html` is run with this [githack](https://raw.githack.com
     8-way Set Associative Cache has `8` blocks per set. With 32 Blocks, there would be `4` sets.
   * The user inputs for the memory block are limited to positive whole numbers
 
-* **Inputs:**
+### **Inputs**
   + `Blocks` - The amount of memory blocks. Usage will vary depending on selected test case.
   + `Input box` - Only modifiable when `Manual Input blocks` is selected. Only accepts numbers and comma as input.
   + `Test case` - The 3 test cases provided in the rubric, with the option of manual input:
@@ -31,7 +31,7 @@ Our main program `index.html` is run with this [githack](https://raw.githack.com
        Example: 8 Blocks = 0, 1,2,3,4,5,6, 1,2,3,4,5,6, 7,8,9,10,11,12,13,14,15 repeated 4 times.
      * *Manual Input blocks* - User input values. The Block size will change in real-time
 
-* **Outputs:**
+### **Outputs**
   * Visual output will depend if user decided to see the step-by-step process or final cache snapshot  
     The step-by-step option shows the caching process per step, updating the cache, hits, and misses in real-time.  
     It also includes an option to skip to the final cache snapshot.  
@@ -45,7 +45,7 @@ Our main program `index.html` is run with this [githack](https://raw.githack.com
     * `Total Access Time`
   * A log file `Caching Log.txt` will be downloaded once caching is finished. It logs the memory block input, the caching process per memory index, the final cache snapshot, and the final statistics
 
-* **Test Case analysis**  
+### **Test Case analysis**  
   Before discussing each test case, we'll first identify the formulas used in the final statistics.  
   Since the read policy specification of this simulation is `Load-Through`, the following formulas are applied:
   * The `Miss Penalty` would be `1`probe + `10`memAccessTime = `11` ns
