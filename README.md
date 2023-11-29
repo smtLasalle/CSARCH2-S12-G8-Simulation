@@ -73,9 +73,9 @@ Our main program `index.html` is run with this [githack](https://raw.githack.com
 
     * Cache memory tracing  
       Since the test case generates inputs randomly with each run, the resulting snapshots will typically vary.
-      Nonetheless, in general, the simulation progresses by cycling through cache blocks, filling empty ones first
-      before applying the LRU algorithm. Once the last empty block in a set is filled, subsequent misses will
-      substitute the LRU block in a set, and the pattern continues.
+      In general, the simulation progresses by cycling through cache blocks, filling empty blocks first before
+      overwriting filled blocks via the LRU algorithm. Once the last empty block in a set is filled, subsequent
+      misses will substitute the LRU block in a set, and the pattern continues.
 
     * Output statistics  
       Since every sequence is random, the only constant value was the memory access time of `128`.
