@@ -60,10 +60,23 @@ Our main program `index.html` is run with this [githack](https://raw.githack.com
     Given a blocks input `n = 64`, the sequential sequence would range from `0` to `63`, repeated 4 times
 
     * Cache memory tracing  
-      Detail cache trace here
+      The test case generates the number of blocks input in which it is arrange sequentially (i.e. `0` to `2n-1`) and
+      this would repeat 4 times. The simulation process will start from the cycling through the 32 memory values from the
+      memory block (`0` to `31`) which would fill up the empty cache blocks. This would result a miss since the values
+      are not present in the cache blocks. Then, the next 32 memory values of the memory block (`32` to `63`) will
+      replace the first 32 memory value of the cache block since it uses the LRU algorithm. It will be followed by
+      the next 32 memory values (`0` to `31`) which would overwrite the filled-up cache block resulting to another
+      cache misses. Lastly, the next 32 memory values of the memory block (`32` to `63`) will replace again the previous
+      32 memory value of the cache block since it uses the LRU algorithm and the cycle goes on until all memory values
+      are accessed. 
 
     * Output statistics  
-      Detail output statistic answers here
+      The memory access count is `256` due to the number of memory blocks accessed (`2n * 4`, where `n = 32`). Ht rate
+      is `0` because there were no cache hits while miss rate is `256/256` resulting to `1` because there are `256`
+      cache misses.
+      The average memory access time is `11.00` ns because of the formula: `hitRate * cacheAccessTime + missRate * missPenalty`.
+      While the total memory access time is `164096` ns because of the formula: `(hitCount + wordsPerBlock + cacheAccessTime) + missCount * [1 + (wordsPerBlock * memAccessTime)]`
+      
 
   * **Random sequence**  
     The random sequence has a range of `n` blocks.  
@@ -83,12 +96,27 @@ Our main program `index.html` is run with this [githack](https://raw.githack.com
       the total access time ranges around `48000` to `57000` ns, with few getting lower or higher.
     
   * **Mid-Repeat sequence**  
-    Explanation here
+    The mid-repeat sequence starts at block `0`, then ranges from `1` to `n-2` which will repeat two times, after which
+    it continues from `n-1` to `2n-1`. This sequence will be repeated 4 times.
+    To simulate the requested test case of `32` blocks, it will be `0`, `1` to `30`, `1` to `30` then `31` to `63`.
+    The sequence will repeat 4 times. This will result to `376` memory blocks.
 
     * Cache memory tracing  
-      Detail cache trace here
+      The test generates 376 memory blocks to be cached to the set associative cache of 32 blocks. The simulation process
+      will start with block `0`. Then, it will cycle from the sequence values `1` to `n-2` which is `30`. This will
+      cause 31 cache misses. Then, another sequence values of `1` to `n-2` which is `30` will be accessed. This will
+      cause 30 cache hits since the values are present. However, in set 3, there would be an empty block set which is
+      located at the last block set. The next sequence values will now be from `n-1` to `2n-1`.
+      Upon reaching `31` and `32`, two from the cache block will be overwritten because of the LRU algorithm in this
+      case, `1` and `2`. However, upon reaching `33` it will now be placed in the last empty block set in set 3. Then.
+      `0` will be overwritten by `34` since LRU is used and the rest will be overwritten also until all memory values
+      are accessed.
 
     * Output statistics  
-      Detail output statistic answers here
+      The memory access count is `376` due to the number of memory blocks accessed. Ht rate
+      is `120/376` or `0.32` because there are `120` cache hits while miss rate is `256/376` or `0.68` because there are
+      `256` cache misses.
+      The average memory access time is `7.81` ns because of the formula: `hitRate * cacheAccessTime + missRate * missPenalty`.
+      While the total memory access time is `171776` ns because of the formula: `(hitCount + wordsPerBlock + cacheAccessTime) + missCount * [1 + (wordsPerBlock * memAccessTime)]`
     
   
