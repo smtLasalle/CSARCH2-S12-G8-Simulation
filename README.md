@@ -105,12 +105,13 @@ Our main program `index.html` is run with this [githack](https://raw.githack.com
       The test generates 376 memory blocks to be cached to the set associative cache of 32 blocks. The simulation process
       will start with block `0`. Then, it will cycle from the sequence values `1` to `n-2` which is `30`. This will
       cause 31 cache misses. Then, another sequence values of `1` to `n-2` which is `30` will be accessed. This will
-      cause 30 cache hits since the values are present. However, in set 3, there would be an empty block set which is
-      located at the last block set. The next sequence values will now be from `n-1` to `2n-1`.
-      Upon reaching `31` and `32`, two from the cache block will be overwritten because of the LRU algorithm in this
-      case, `1` and `2`. However, upon reaching `33` it will now be placed in the last empty block set in set 3. Then.
-      `0` will be overwritten by `34` since LRU is used and the rest will be overwritten also until all memory values
-      are accessed.
+      cause 30 cache hits since the values are present. However, there would be an empty block which is located at the
+      last block set, `set 3`. The next sequence values will now be from `n-1` to `2n-1`.
+      Upon reaching `31` and `32`, a cache block from `set 1` and `set 2` respectively will be overwritten because of
+      the LRU algorithm, in this case, the blocks containing `1` and `2`. However, upon reaching `33` it will now be
+      placed in the last empty block set in `set 3`. Then `0` in `set 0` will be overwritten by `34` since LRU is used
+      and the rest will be overwritten also until all memory values are accessed. The final snapshot would look identical
+      to the final snapshot of the sequential test case.
 
     * Output statistics  
       The memory access count is `376` due to the number of memory blocks accessed. Ht rate
